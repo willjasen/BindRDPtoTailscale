@@ -8,7 +8,7 @@ $ts = gwmi Win32_TSNetworkAdapterSetting -filter "TerminalName='RDP-Tcp'" -names
 $found = $false
 For($i=0; $i -lt ($ts.DeviceIDList).Count; $i++) {
 	If($ts.NetworkAdapterList[$i] -eq "Tailscale Tunnel") {
-		$ts.SetNetworkAdapterLanaID($ts.DeviceIDList[$i])
+		$ts.SetNetworkAdapterLanaID($ts.DeviceIDList[$i]) | Out-Null
 		$found = $true
 		break;
 	}
