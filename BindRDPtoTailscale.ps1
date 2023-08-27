@@ -1,5 +1,11 @@
-# Display which interface(s) that RDP is bound to
+# Don't do anything if Tailscale is already bound to RDP
 $currentSettings = (gwmi Win32_TSNetworkAdapterSetting -filter "TerminalName='RDP-Tcp'" -namespace "root/cimv2/TerminalServices" | Select NetworkAdapterLanaID,NetworkAdapterName)
+If($currentSettings.NetworkAdapterName -eq "Tailscale Tunnel") {
+	Write-Host "RDP is already bound to Tailscale, exiting"
+	Exit
+}
+
+# Display which interface(s) that RDP is bound to
 Write-Host ("Network adapter ID for RDP: " + $currentSettings.NetworkAdapterLanaID)
 Write-Host ("Network adapter name for RDP: " + $currentSettings.NetworkAdapterName)
 
