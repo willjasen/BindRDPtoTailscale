@@ -26,9 +26,10 @@ If($found) {
 	Write-Host ("New network adapter ID for RDP: " + $updatedSettings.NetworkAdapterLanaID)
 	Write-Host ("New network adapter name for RDP: " + $updatedSettings.NetworkAdapterName)
 	
-	Write-Host "Restarting Remote Desktop Services in 5 seconds"
+	Write-Host "Restarting the computer in 5 seconds..."
 	Start-Sleep -Seconds 5
-	Restart-Service -Force -DisplayName "Remote Desktop Services"
+	Stop-Service -Force -DisplayName "Remote Desktop Services"
+	Restart-Computer
 }
 Else {
 	Write-Host "Tailscale adapter was not found, so no changes were made"
