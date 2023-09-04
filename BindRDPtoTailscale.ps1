@@ -29,7 +29,7 @@ If($found) {
 	Write-Host "Restarting the computer in 5 seconds..."
 	Start-Sleep -Seconds 5
 	Stop-Service -Force -DisplayName "Remote Desktop Services"
-	Restart-Computer
+	Restart-Computer -Force
 }
 Else {
 	Write-Host "Tailscale adapter was not found, so no changes were made"
