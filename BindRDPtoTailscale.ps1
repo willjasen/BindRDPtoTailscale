@@ -45,11 +45,6 @@ If($found) {
 		Write-Host ("Setting the firewall rule for Remote Desktop to only allow the Tailscale IP: " + $tailscaleIP)
 		$rdpFirewallRule | Set-NetFirewallRule -LocalAddress $tailscaleIP
 	}
-	
-	Write-Host "Restarting the computer in 5 seconds..."
-	Start-Sleep -Seconds 5
-	Stop-Service -Force -DisplayName "Remote Desktop Services"
-	Restart-Computer -Force
 }
 Else {
 	Write-Host "Tailscale adapter was not found, so no changes were made"
