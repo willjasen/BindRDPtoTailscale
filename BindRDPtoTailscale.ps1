@@ -2,7 +2,7 @@
 $currentSettings = (gwmi Win32_TSNetworkAdapterSetting -filter "TerminalName='RDP-Tcp'" -namespace "root/cimv2/TerminalServices" | Select NetworkAdapterLanaID,NetworkAdapterName)
 If($currentSettings.NetworkAdapterName -eq "Tailscale Tunnel") {
 	Write-Host "RDP is already bound to Tailscale, exiting"
-	Exit
+	#Exit
 }
 
 # Display which interface(s) that RDP is bound to
@@ -26,11 +26,22 @@ If($found) {
 	Write-Host ("New network adapter ID for RDP: " + $updatedSettings.NetworkAdapterLanaID)
 	Write-Host ("New network adapter name for RDP: " + $updatedSettings.NetworkAdapterName)
 	
-	Write-Host "Restarting the computer in 5 seconds..."
-	Start-Sleep -Seconds 5
-	Stop-Service -Force -DisplayName "Remote Desktop Services"
-	Restart-Computer -Force
+	#Write-Host "Restarting the computer in 5 seconds..."
+	#Start-Sleep -Seconds 5
+	#Stop-Service -Force -DisplayName "Remote Desktop Services"
+	#Restart-Computer -Force
 }
 Else {
 	Write-Host "Tailscale adapter was not found, so no changes were made"
+}
+
+# Update the Windows Firewall rule to only allow connections to the local Tailscale IP address (if needed)
+$tailscaleIP = Get-NetIPAddress | Where { $_.InterfaceAlias -eq "Tailscale" -and $_.AddressFamily -eq "IPv4" } | Select -ExpandProperty IPAddress
+$rdpFirewallRule = Get-NetFirewallRule -DisplayName "Remote Desktop - User Mode (TCP-In)"
+If($rdpFirewallRule | Get-NetFirewallAddressFilter | Where { $_.LocalAddress -eq $tailscaleIP }) {
+	Write-Host ("The firewall rule for Remote Desktop already allows the local Tailscale IP: " + $tailscaleIP)
+}
+Else {
+	Write-Host ("Setting the firewall rule for Remote Desktop to only allow the Tailscale IP: " + $tailscaleIP)
+	$rdpFirewallRule | Set-NetFirewallRule -LocalAddress $tailscaleIP
 }
